@@ -26,11 +26,9 @@ func (p *Parks) Initialize() {
 
 // SearchByCode - Find park information by code
 func (p *Parks) SearchByCode(code string) *loader.ParkData {
-	log.Printf(code)
 	ret := Filter(p.Store, func(v *loader.ParkData) bool {
 		return strings.ToLower(v.Code) == strings.ToLower(code)
 	})
-	log.Printf("%v", ret)
 	if len(*ret) > 0 {
 		return (*ret)[0]
 	}
