@@ -3,21 +3,23 @@ package loader
 import (
 	"encoding/csv"
 	"io"
-	"log"
 	"strconv"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // ParkData is data about a national park
 type ParkData struct {
-	Code      string   `json:"Park Code"`
-	Name      string   `json:"Park Name"`
-	States    []string `json:"State"`
-	Acres     int      `json:"Acres"`
-	Latitude  float64  `json:"Latitude"`
-	Longitude float64  `json:"Longitude"`
+	ID        string   `json:"park_id"`
+	Name      string   `json:"park_name"`
+	States    []string `json:"states"`
+	Acres     int      `json:"acres"`
+	Latitude  float64  `json:"latitude"`
+	Longitude float64  `json:"longitude"`
 }
 
+// LoadParkData loads the csv data into memory
 func LoadParkData(r io.Reader) *[]*ParkData {
 	reader := csv.NewReader(r)
 
@@ -26,10 +28,10 @@ func LoadParkData(r io.Reader) *[]*ParkData {
 	for {
 		row, err := reader.Read()
 		if err == io.EOF {
-			log.Println("End of File")
+			log.Debug("end of file")
 			break
 		} else if err != nil {
-			log.Println(err)
+			log.Error(err)
 			break
 		}
 
@@ -39,7 +41,7 @@ func LoadParkData(r io.Reader) *[]*ParkData {
 		longitude, _ := strconv.ParseFloat(row[5], 64)
 
 		park := &ParkData{
-			Code:      row[0],
+			ID:        row[0],
 			Name:      row[1],
 			States:    states,
 			Acres:     acres,

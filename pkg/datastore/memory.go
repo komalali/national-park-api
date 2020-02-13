@@ -24,10 +24,10 @@ func (p *Parks) Initialize() {
 	p.Store = loader.LoadParkData(file)
 }
 
-// SearchByCode - Find park information by code
-func (p *Parks) SearchByCode(code string) *loader.ParkData {
+// SearchByID - Find park information by code
+func (p *Parks) SearchByID(id string) *loader.ParkData {
 	ret := Filter(p.Store, func(v *loader.ParkData) bool {
-		return strings.ToLower(v.Code) == strings.ToLower(code)
+		return strings.ToLower(v.ID) == strings.ToLower(id)
 	})
 	if len(*ret) > 0 {
 		return (*ret)[0]
