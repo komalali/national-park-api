@@ -65,7 +65,7 @@ type SpeciesData struct {
 	Category           string   `json:"category"`
 	Order              string   `json:"order"`
 	Family             string   `json:"family"`
-	ScientificName     string   `json:"scientific_name`
+	ScientificName     string   `json:"scientific_name"`
 	CommonNames        []string `json:"common_names"`
 	RecordStatus       string   `json:"record_status"`
 	Occurrence         string   `json:"occurrence"`
