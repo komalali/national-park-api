@@ -35,6 +35,10 @@ func LoadParkData(r io.Reader) *[]*ParkData {
 			break
 		}
 
+		if row[0] == "Park Code" {
+			continue
+		}
+
 		states := strings.Split(row[2], ",")
 		acres, _ := strconv.Atoi(row[3])
 		latitude, _ := strconv.ParseFloat(row[4], 64)

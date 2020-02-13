@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var parks datastore.Store
+var parks datastore.ParkStore
 
 func timeTrack(start time.Time, name string) {
 	elapsed := time.Since(start)
@@ -28,12 +28,9 @@ func main() {
 
 	api := router.PathPrefix("/api/v1").Subrouter()
 
-	api.HandleFunc("", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status": "ok", "message": "api v1"}`))
-	})
+	api.HandleFunc("", home).Methods(http.MethodGet)
 	api.HandleFunc("/parks/id/{id}", getParkByID).Methods(http.MethodGet)
+	api.HandleFunc("/parks", getAllParks).Methods(http.MethodGet)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

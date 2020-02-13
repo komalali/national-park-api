@@ -35,6 +35,12 @@ func (p *Parks) SearchByID(id string) *loader.ParkData {
 	return nil
 }
 
+// GetAllParks - Return all the parks
+func (p *Parks) GetAllParks() *[]*loader.ParkData {
+	return p.Store
+}
+
+// Filter - returns a slice of parks
 func Filter(vs *[]*loader.ParkData, f func(*loader.ParkData) bool) *[]*loader.ParkData {
 	vsf := make([]*loader.ParkData, 0)
 	for _, v := range *vs {
