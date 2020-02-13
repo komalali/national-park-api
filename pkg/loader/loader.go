@@ -19,7 +19,7 @@ type ParkData struct {
 	Longitude float64  `json:"longitude"`
 }
 
-// LoadParkData loads the csv data into memory
+// LoadParkData loads the park csv data into memory
 func LoadParkData(r io.Reader) *[]*ParkData {
 	reader := csv.NewReader(r)
 
@@ -54,6 +54,66 @@ func LoadParkData(r io.Reader) *[]*ParkData {
 		}
 
 		ret = append(ret, park)
+	}
+	return &ret
+}
+
+// SpeciesData is data about species found in national parks
+type SpeciesData struct {
+	ID                 string   `json:"species_id"`
+	ParkName           string   `json:"park_name"`
+	Category           string   `json:"category"`
+	Order              string   `json:"order"`
+	Family             string   `json:"family"`
+	ScientificName     string   `json:"scientific_name`
+	CommonNames        []string `json:"common_names"`
+	RecordStatus       string   `json:"record_status"`
+	Occurrence         string   `json:"occurrence"`
+	Nativeness         string   `json:"nativeness,omitempty"`
+	Abundance          string   `json:"abundance,omitempty"`
+	Seasonality        string   `json:"seasonality,omitempty"`
+	ConservationStatus string   `json:"conservation_status,omitempty"`
+}
+
+// LoadSpeciesData loads the species csv data into memory
+func LoadSpeciesData(r io.Reader) *[]*SpeciesData {
+	reader := csv.NewReader(r)
+
+	ret := make([]*SpeciesData, 0, 0)
+
+	for {
+		row, err := reader.Read()
+		if err == io.EOF {
+			log.Debug("end of file")
+			break
+		} else if err != nil {
+			log.Error(err)
+			break
+		}
+
+		if row[0] == "Species ID" {
+			continue
+		}
+
+		commonNames := strings.Split(row[6], ",")
+
+		species := &SpeciesData{
+			ID:                 row[0],
+			ParkName:           row[1],
+			Category:           row[2],
+			Order:              row[3],
+			Family:             row[4],
+			ScientificName:     row[5],
+			CommonNames:        commonNames,
+			RecordStatus:       row[7],
+			Occurrence:         row[8],
+			Nativeness:         row[9],
+			Abundance:          row[10],
+			Seasonality:        row[11],
+			ConservationStatus: row[12],
+		}
+
+		ret = append(ret, species)
 	}
 	return &ret
 }
