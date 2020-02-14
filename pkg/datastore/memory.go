@@ -1,32 +1,42 @@
 package datastore
 
 import (
-	"log"
 	"os"
 	"strings"
 
 	"github.com/komalali/national-parks/api/pkg/loader"
+	log "github.com/sirupsen/logrus"
 )
 
 // Parks - collection of parks
-type Parks struct {
-	Store *[]*loader.ParkData `json:"store"`
+type Data struct {
+	Store *loader.Database `json:"store"`
 }
 
 // Initialize the Park store
-func (p *Parks) Initialize() {
-	filename := "./data/parks.csv"
-	file, err := os.Open(filename)
+func (d *Data) Initialize() {
+	parkFilename := "./data/parks.csv"
+	speciesFilename := "./data/species.csv"
+
+	parkFile, err := os.Open(parkFilename)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
-	defer file.Close()
-	p.Store = loader.LoadParkData(file)
+	defer parkFile.Close()
+
+	speciesFile, err := os.Open(speciesFilename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer speciesFile.Close()
+
+	d.Store = loader.LoadData(parkFile, speciesFile)
 }
 
-// SearchByID - Find park information by code
-func (p *Parks) SearchByID(id string) *loader.ParkData {
-	ret := Filter(p.Store, func(v *loader.ParkData) bool {
+// GetParkById - Find park information by code
+func (d *Data) GetParkByID(id string) *loader.ParkData {
+	parks := d.Store.Parks
+	ret := Filter(parks, func(v *loader.ParkData) bool {
 		return strings.ToLower(v.ID) == strings.ToLower(id)
 	})
 	if len(*ret) > 0 {
@@ -36,8 +46,8 @@ func (p *Parks) SearchByID(id string) *loader.ParkData {
 }
 
 // GetAllParks - Return all the parks
-func (p *Parks) GetAllParks() *[]*loader.ParkData {
-	return p.Store
+func (d *Data) GetAllParks() *[]*loader.ParkData {
+	return d.Store.Parks
 }
 
 // Filter - returns a slice of parks

@@ -9,6 +9,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type Database struct {
+	Parks   *[]*ParkData
+	Species *[]*SpeciesData
+}
+
 // ParkData is data about a national park
 type ParkData struct {
 	ID        string   `json:"park_id"`
@@ -19,8 +24,36 @@ type ParkData struct {
 	Longitude float64  `json:"longitude"`
 }
 
-// LoadParkData loads the park csv data into memory
-func LoadParkData(r io.Reader) *[]*ParkData {
+// SpeciesData is data about species found in national parks
+type SpeciesData struct {
+	ID                 string   `json:"species_id"`
+	ParkName           string   `json:"park_name"`
+	Category           string   `json:"category"`
+	Order              string   `json:"order"`
+	Family             string   `json:"family"`
+	ScientificName     string   `json:"scientific_name"`
+	CommonNames        []string `json:"common_names"`
+	RecordStatus       string   `json:"record_status"`
+	Occurrence         string   `json:"occurrence"`
+	Nativeness         string   `json:"nativeness,omitempty"`
+	Abundance          string   `json:"abundance,omitempty"`
+	Seasonality        string   `json:"seasonality,omitempty"`
+	ConservationStatus string   `json:"conservation_status,omitempty"`
+}
+
+// LoadData loads the data from files into memory
+func LoadData(parkReader io.Reader, speciesReader io.Reader) *Database {
+	parks := loadParkData(parkReader)
+	species := loadSpeciesData(speciesReader)
+
+	return &Database{
+		Parks:   parks,
+		Species: species,
+	}
+}
+
+// loadParkData loads the park csv data into memory
+func loadParkData(r io.Reader) *[]*ParkData {
 	reader := csv.NewReader(r)
 
 	ret := make([]*ParkData, 0, 0)
@@ -58,25 +91,8 @@ func LoadParkData(r io.Reader) *[]*ParkData {
 	return &ret
 }
 
-// SpeciesData is data about species found in national parks
-type SpeciesData struct {
-	ID                 string   `json:"species_id"`
-	ParkName           string   `json:"park_name"`
-	Category           string   `json:"category"`
-	Order              string   `json:"order"`
-	Family             string   `json:"family"`
-	ScientificName     string   `json:"scientific_name"`
-	CommonNames        []string `json:"common_names"`
-	RecordStatus       string   `json:"record_status"`
-	Occurrence         string   `json:"occurrence"`
-	Nativeness         string   `json:"nativeness,omitempty"`
-	Abundance          string   `json:"abundance,omitempty"`
-	Seasonality        string   `json:"seasonality,omitempty"`
-	ConservationStatus string   `json:"conservation_status,omitempty"`
-}
-
-// LoadSpeciesData loads the species csv data into memory
-func LoadSpeciesData(r io.Reader) *[]*SpeciesData {
+// loadSpeciesData loads the species csv data into memory
+func loadSpeciesData(r io.Reader) *[]*SpeciesData {
 	reader := csv.NewReader(r)
 
 	ret := make([]*SpeciesData, 0, 0)

@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var parks datastore.ParkStore
+var data datastore.DataStore
 
 func timeTrack(start time.Time, name string) {
 	elapsed := time.Since(start)
@@ -19,8 +19,8 @@ func timeTrack(start time.Time, name string) {
 
 func init() {
 	defer timeTrack(time.Now(), "file load")
-	parks = &datastore.Parks{}
-	parks.Initialize()
+	data = &datastore.Data{}
+	data.Initialize()
 }
 
 func main() {

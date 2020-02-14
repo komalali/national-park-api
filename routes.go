@@ -21,9 +21,9 @@ func getParkByID(w http.ResponseWriter, r *http.Request) {
 
 	if val, ok := pathParams["id"]; ok {
 		logger := log.WithFields(log.Fields{"method": "GET", "id": val})
-		data := parks.SearchByID(val)
-		if data != nil {
-			b, err := json.Marshal(data)
+		result := data.GetParkByID(val)
+		if result != nil {
+			b, err := json.Marshal(result)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte(`{"error": "error marshalling data"}`))
@@ -44,9 +44,9 @@ func getParkByID(w http.ResponseWriter, r *http.Request) {
 func getAllParks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	logger := log.WithFields(log.Fields{"method": "GET"})
-	data := parks.GetAllParks()
+	result := data.GetAllParks()
 
-	b, err := json.Marshal(data)
+	b, err := json.Marshal(result)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"error": "error marshalling data"}`))
