@@ -3,7 +3,6 @@ package main
 import (
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/komalali/national-parks/api/pkg/database"
 	log "github.com/sirupsen/logrus"
 )
@@ -22,7 +21,6 @@ func init() {
 }
 
 func main() {
-	spew.Dump(db.Parks)
 	// router := mux.NewRouter()
 
 	// api := router.PathPrefix("/api/v1").Subrouter()
