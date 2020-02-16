@@ -35,6 +35,9 @@ func main() {
 	} else {
 		spew.Dump(park)
 	}
+
+	parks := db.GetParks()
+	spew.Dump(parks)
 	// router := mux.NewRouter()
 
 	// api := router.PathPrefix("/api/v1").Subrouter()
