@@ -1,22 +1,25 @@
-package loader
+package database
 
 import (
 	"encoding/csv"
 	"io"
+	"os"
 	"strconv"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
 )
 
+// Database is the entire data object, parsed from csv files
 type Database struct {
-	Parks   *[]*ParkData
-	Species *[]*SpeciesData
+	Parks       *map[string]*Park
+	Species     *map[string]*Species
+	ParkRecords *[]*ParkRecord
 }
 
-// ParkData is data about a national park
-type ParkData struct {
-	ID        string   `json:"park_id"`
+// Park is a national park
+type Park struct {
+	ID        string   `json:"id"`
 	Name      string   `json:"park_name"`
 	States    []string `json:"states"`
 	Acres     int      `json:"acres"`
@@ -24,39 +27,53 @@ type ParkData struct {
 	Longitude float64  `json:"longitude"`
 }
 
-// SpeciesData is data about species found in national parks
-type SpeciesData struct {
-	ID                 string   `json:"species_id"`
-	ParkName           string   `json:"park_name"`
+// Species is an individual species
+type Species struct {
+	ID                 string   `json:"id"`
 	Category           string   `json:"category"`
 	Order              string   `json:"order"`
 	Family             string   `json:"family"`
 	ScientificName     string   `json:"scientific_name"`
 	CommonNames        []string `json:"common_names"`
-	RecordStatus       string   `json:"record_status"`
-	Occurrence         string   `json:"occurrence"`
-	Nativeness         string   `json:"nativeness,omitempty"`
-	Abundance          string   `json:"abundance,omitempty"`
-	Seasonality        string   `json:"seasonality,omitempty"`
 	ConservationStatus string   `json:"conservation_status,omitempty"`
 }
 
-// LoadData loads the data from files into memory
-func LoadData(parkReader io.Reader, speciesReader io.Reader) *Database {
-	parks := loadParkData(parkReader)
-	species := loadSpeciesData(speciesReader)
-
-	return &Database{
-		Parks:   parks,
-		Species: species,
-	}
+// ParkRecord is a species that has been recorded in a national park
+type ParkRecord struct {
+	ID           string   `json:"id"`
+	Park         *Park    `json:"park_id"`
+	Species      *Species `json:"species_id"`
+	RecordStatus string   `json:"record_status"`
+	Occurrence   string   `json:"occurrence"`
+	Nativeness   string   `json:"nativeness,omitempty"`
+	Abundance    string   `json:"abundance,omitempty"`
+	Seasonality  string   `json:"seasonality,omitempty"`
 }
 
-// loadParkData loads the park csv data into memory
-func loadParkData(r io.Reader) *[]*ParkData {
+// Initialize the database
+func (db *Database) Initialize() {
+	parkFilename := "./data/parks.csv"
+	speciesFilename := "./data/species.csv"
+
+	parkFile, err := os.Open(parkFilename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer parkFile.Close()
+
+	speciesFile, err := os.Open(speciesFilename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer speciesFile.Close()
+
+	db.parseParkFile(parkFile)
+}
+
+func (db *Database) parseParkFile(r io.Reader) {
 	reader := csv.NewReader(r)
 
-	ret := make([]*ParkData, 0, 0)
+	ret := make(map[string]*Park)
 
 	for {
 		row, err := reader.Read()
@@ -77,7 +94,7 @@ func loadParkData(r io.Reader) *[]*ParkData {
 		latitude, _ := strconv.ParseFloat(row[4], 64)
 		longitude, _ := strconv.ParseFloat(row[5], 64)
 
-		park := &ParkData{
+		park := &Park{
 			ID:        row[0],
 			Name:      row[1],
 			States:    states,
@@ -86,16 +103,15 @@ func loadParkData(r io.Reader) *[]*ParkData {
 			Longitude: longitude,
 		}
 
-		ret = append(ret, park)
+		ret[row[0]] = park
 	}
-	return &ret
+	db.Parks = &ret
 }
 
-// loadSpeciesData loads the species csv data into memory
-func loadSpeciesData(r io.Reader) *[]*SpeciesData {
+func parseSpeciesFile(r io.Reader) *[]*Species {
 	reader := csv.NewReader(r)
 
-	ret := make([]*SpeciesData, 0, 0)
+	ret := make([]*Species, 0, 0)
 
 	for {
 		row, err := reader.Read()
@@ -113,19 +129,13 @@ func loadSpeciesData(r io.Reader) *[]*SpeciesData {
 
 		commonNames := strings.Split(row[6], ",")
 
-		species := &SpeciesData{
+		species := &Species{
 			ID:                 row[0],
-			ParkName:           row[1],
 			Category:           row[2],
 			Order:              row[3],
 			Family:             row[4],
 			ScientificName:     row[5],
 			CommonNames:        commonNames,
-			RecordStatus:       row[7],
-			Occurrence:         row[8],
-			Nativeness:         row[9],
-			Abundance:          row[10],
-			Seasonality:        row[11],
 			ConservationStatus: row[12],
 		}
 

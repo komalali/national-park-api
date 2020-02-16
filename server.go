@@ -1,15 +1,14 @@
 package main
 
 import (
-	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
-	"github.com/komalali/national-parks/api/pkg/datastore"
+	"github.com/davecgh/go-spew/spew"
+	"github.com/komalali/national-parks/api/pkg/database"
 	log "github.com/sirupsen/logrus"
 )
 
-var data datastore.DataStore
+var db database.Database
 
 func timeTrack(start time.Time, name string) {
 	elapsed := time.Since(start)
@@ -19,18 +18,18 @@ func timeTrack(start time.Time, name string) {
 
 func init() {
 	defer timeTrack(time.Now(), "file load")
-	data = &datastore.Data{}
-	data.Initialize()
+	db.Initialize()
 }
 
 func main() {
-	router := mux.NewRouter()
+	spew.Dump(db.Parks)
+	// router := mux.NewRouter()
 
-	api := router.PathPrefix("/api/v1").Subrouter()
+	// api := router.PathPrefix("/api/v1").Subrouter()
 
-	api.HandleFunc("", home).Methods(http.MethodGet)
-	api.HandleFunc("/parks/id/{id}", getParkByID).Methods(http.MethodGet)
-	api.HandleFunc("/parks", getAllParks).Methods(http.MethodGet)
+	// api.HandleFunc("", home).Methods(http.MethodGet)
+	// api.HandleFunc("/parks/id/{id}", getParkByID).Methods(http.MethodGet)
+	// api.HandleFunc("/parks", getAllParks).Methods(http.MethodGet)
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	// log.Fatal(http.ListenAndServe(":8080", router))
 }
