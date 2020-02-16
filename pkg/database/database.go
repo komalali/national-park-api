@@ -40,8 +40,9 @@ func (db *Database) GetParkByID(id string) (park *Park, err error) {
 // GetParks - Fetch all parks
 func (db *Database) GetParks() *[]*Park {
 	parks := make([]*Park, 0, len(*db.Parks))
-	for key := range *db.Parks {
-		parks = append(parks, (*db.Parks)[key])
+
+	for _, value := range *db.Parks {
+		parks = append(parks, value)
 	}
 	return &parks
 }
@@ -53,4 +54,16 @@ func (db *Database) GetSpeciesByID(id string) (species *Species, err error) {
 		return species, nil
 	}
 	return nil, errors.New("species not found")
+}
+
+// GetSpeciesByPark - Get all the species in a park
+func (db *Database) GetSpeciesByPark(parkID string) *[]*Species {
+	ret := make([]*Species, 0, 0)
+	for _, item := range *db.ParkRecords {
+		if item.Park.ID == parkID {
+			ret = append(ret, item.Species)
+		}
+	}
+
+	return &ret
 }

@@ -36,8 +36,12 @@ func main() {
 		spew.Dump(park)
 	}
 
-	parks := db.GetParks()
-	spew.Dump(parks)
+	// parks := db.GetParks()
+	// spew.Dump(len(*parks))
+
+	speciesAtArches := db.GetSpeciesByPark("ARCH")
+	spew.Dump(speciesAtArches)
+
 	// router := mux.NewRouter()
 
 	// api := router.PathPrefix("/api/v1").Subrouter()
