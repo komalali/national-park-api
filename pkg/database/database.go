@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"os"
 
 	log "github.com/sirupsen/logrus"
@@ -26,3 +27,23 @@ func (db *Database) Initialize() {
 	db.parseParkFile(parkFile)
 	db.parseSpeciesFile(speciesFile)
 }
+
+// GetParkByID - Fetch park struct by id
+func (db *Database) GetParkByID(id string) (park *Park, err error) {
+	park, ok := (*db.Parks)[id]
+	if ok {
+		return park, nil
+	}
+	return nil, errors.New("park not found")
+}
+
+// GetSpeciesByID - Fetch species struct by id
+func (db *Database) GetSpeciesByID(id string) (species *Species, err error) {
+	species, ok := (*db.Species)[id]
+	if ok {
+		return species, nil
+	}
+	return nil, errors.New("species not found")
+}
+
+// GetParkRecordByID

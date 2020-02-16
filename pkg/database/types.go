@@ -26,6 +26,11 @@ type Species struct {
 	ScientificName     string   `json:"scientific_name"`
 	CommonNames        []string `json:"common_names"`
 	ConservationStatus string   `json:"conservation_status,omitempty"`
+	Parks              []string
+}
+
+func (species *Species) addPark(park *Park) {
+	species.Parks = append(species.Parks, park.ID)
 }
 
 // ParkRecord is a species that has been recorded in a national park

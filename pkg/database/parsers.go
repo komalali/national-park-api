@@ -73,8 +73,11 @@ func (db *Database) parseSpeciesFile(r io.Reader) {
 			continue
 		}
 
+		parkID := strings.Split(row[0], "-")[0]
+		park := (*db.Parks)[parkID]
 		scientificNameSlug := slug.Make(row[5])
-		_, ok := speciesMap[scientificNameSlug]
+
+		foundSpecies, ok := speciesMap[scientificNameSlug]
 		if !ok {
 			commonNames := strings.Split(row[6], ",")
 			for i := range commonNames {
@@ -88,16 +91,17 @@ func (db *Database) parseSpeciesFile(r io.Reader) {
 				ScientificName:     row[5],
 				CommonNames:        commonNames,
 				ConservationStatus: row[12],
+				Parks:              []string{},
 			}
-
+			species.addPark(park)
 			speciesMap[scientificNameSlug] = species
+		} else {
+			foundSpecies.addPark(park)
 		}
-
-		parkID := strings.Split(row[0], "-")[0]
 
 		record := &ParkRecord{
 			ID:           row[0],
-			Park:         (*db.Parks)[parkID],
+			Park:         park,
 			Species:      species,
 			RecordStatus: row[7],
 			Occurrence:   row[8],
@@ -105,7 +109,6 @@ func (db *Database) parseSpeciesFile(r io.Reader) {
 			Abundance:    row[10],
 			Seasonality:  row[11],
 		}
-
 		parkRecords = append(parkRecords, record)
 	}
 

@@ -3,6 +3,7 @@ package main
 import (
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/komalali/national-parks/api/pkg/database"
 	log "github.com/sirupsen/logrus"
 )
@@ -21,6 +22,19 @@ func init() {
 }
 
 func main() {
+	species, err := db.GetSpeciesByID("colpophyllia-natans")
+	if err != nil {
+		log.Error(err)
+	} else {
+		spew.Dump(species)
+	}
+
+	park, err := db.GetParkByID("ARCH")
+	if err != nil {
+		log.Error(err)
+	} else {
+		spew.Dump(park)
+	}
 	// router := mux.NewRouter()
 
 	// api := router.PathPrefix("/api/v1").Subrouter()
